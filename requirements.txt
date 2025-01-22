@@ -1,0 +1,5 @@
+instaloader
+google-api-python-client
+oauth2client
+requests
+python-dotenv
