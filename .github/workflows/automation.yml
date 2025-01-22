@@ -1,0 +1,44 @@
+name: Instagram to YouTube Automation
+on:
+  schedule:
+    - cron: '0 16 * * *'  # Run daily at 4 PM (16:00)
+  workflow_dispatch:  # Allow manual triggers
+
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Create temp directory
+        run: mkdir temp
+          
+      - name: Decode YouTube credentials
+        run: echo "${{ secrets.YOUTUBE_CREDENTIALS }}" | base64 -d > client_secrets.json
+          
+      - name: Run automation
+        env:
+          INSTA_USERNAME: ${{ secrets.INSTA_USERNAME }}
+          INSTA_PASSWORD: ${{ secrets.INSTA_PASSWORD }}
+          TARGET_INSTAGRAM_ACCOUNT: ${{ secrets.TARGET_INSTAGRAM_ACCOUNT }}
+          GPT_API_KEY: ${{ secrets.GPT_API_KEY }}
+          PROXY_LIST: ${{ secrets.PROXY_LIST }}
+        run: python src/main.py
+        
+      - name: Commit processed reels
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add processed_reels.json
+          git commit -m "Update processed reels" || echo "No changes to commit"
+          git push
