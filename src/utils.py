@@ -10,6 +10,15 @@ def get_random_proxy(proxies):
         "https": proxy.replace("http://", "https://")
     }
 
+def format_proxy_list(raw_proxies):
+    formatted = []
+    for proxy in raw_proxies.strip().split('\n'):
+        if proxy:
+            ip, port, username, password = proxy.strip().split(':')
+            formatted_proxy = f"http://{username}:{password}@{ip}:{port}"
+            formatted.append(formatted_proxy)
+    return formatted
+
 def load_processed_reels():
     try:
         with open('processed_reels.json', 'r') as f:
