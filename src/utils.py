@@ -4,7 +4,11 @@ from datetime import datetime
 import os
 
 def get_random_proxy(proxies):
-    return random.choice(proxies)
+    proxy = random.choice(proxies)
+    return {
+        "http": proxy,
+        "https": proxy.replace("http://", "https://")
+    }
 
 def load_processed_reels():
     try:
